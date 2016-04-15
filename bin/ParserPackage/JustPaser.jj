@@ -1,0 +1,235 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = true;
+} 
+  
+PARSER_BEGIN(just) 
+package ParserPackage;
+
+public class just 
+{
+  public static void main(String args []) throws ParseException
+  {
+    just parser = new just(System.in);
+    while (true)
+    {
+      System.out.println("Reading from standard input...");
+      System.out.print("Enter an Just synatax  :");
+      try
+      {
+        switch (just.one_line())
+        {
+          case 0 : 
+          System.out.println("OK.");
+          break;
+          case 1 : 
+          System.out.println("Goodbye.");
+          break;
+          default : 
+          break;
+        }
+      }
+      catch (Exception e)
+      {
+        System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        just.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.println("Oops.");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+  }
+}
+
+PARSER_END(just)
+ 
+SKIP :
+{
+  " "
+|  "\r"
+| "\t"
+| "\n"
+}
+
+TOKEN : /* OPERATORS */
+{
+	 < PROGRAM : "program" >
+	| < TYPE : "void"|"int"| "boolean" >
+	| < LGESCHWEIFT : "{" >
+	| < RGESCHWEIFT : "}" >
+	| < ELKLAMMER : "[">
+	| < ERKLAMMER : "]" >
+	| < SEMI : ";" >
+	| < EQUALS : "=" >
+	| < RRKLAMMER : ")" >
+	| < RLKLAMMER : "(" >
+	| < KOMMA : ",">
+	| < WHILE : "while" >
+	| < RETURN : "return" >
+	| < KAUFUND : "&&" >
+	| < OR : "||" >
+	| < GLEICHGLEICH : "=="> 
+	| < AUSGLEICH : "!=" >
+	| < KLEINER : "< " >
+	| < KLEINERGLEICH : " <=" >
+	| < GROESSER : ">" >
+	| < GROESSERGLEICH : ">=" >
+	| < PLUS : "+" >
+	| < MINUS : "-">
+	| < MAL : "*" >
+	| < DIV : "/" >
+	| < AUSRUF : "!" >
+	| < BYREF : "byref" >
+}
+
+
+TOKEN : 
+{
+	  < NUMBER : (< DIGIT >)+ >
+	| < #DIGIT : [ "0"-"9" ] >
+}
+
+TOKEN : 
+{
+	  < WORD : (< LETTER >)+ >
+	| < #LETTER : ["a"-"z", "A"-"Z", "_"] >
+}
+
+TOKEN:
+{   < IDENT : < WORD > (< WORD > | < NUMBER >)* >
+}
+
+TOKEN:
+{	< STAT :  < konkSTAT > | < SEMI > >
+	| < #konkSTAT : "AssignStat" | "CallStat" | "IfStat" | "WhileStat" | "ReturnStat" | "Block" >
+}
+
+int one_line() :
+{}
+{
+  firstExpression() ";;"
+  {
+    return 0;
+  }
+| ";;"
+  {
+    return 1;
+  }
+}
+
+void firstExpression():
+{}
+{
+	< PROGRAM > < IDENT > <LGESCHWEIFT> programmCode() <RGESCHWEIFT>
+}  
+
+void programmCode():
+{}
+{
+  	defintion() 
+}
+
+void block(): {}
+{	< LGESCHWEIFT > (varDef() | < STAT >)* < RGESCHWEIFT >
+}
+
+/*Definition= { VarDef| FuncDef}.*/
+void defintion(): {}{
+  (varDef() | funcDef())*}
+
+/* FuncDef =FuncHeadBlock.*/
+void funcDef():{}
+{
+  funcHeadBlock()}
+/*FuncHead = Type ident "(" [ FormParList] ")".*/
+void funcHeadBlock(): {}
+{
+  < TYPE > <IDENT > <RLKLAMMER > (formParList())+ < RRKLAMMER >}
+
+/*FormParList = ["byref"] Type ident{"," ["byref"] Type ident}.*/
+void formParList():{}{
+  (< BYREF >)? <TYPE > <IDENT > ( < KOMMA >  (< BYREF >)+ < TYPE > <IDENT >)* }
+ 
+/*ident "=" Expr";".*/
+void assignStat ():{}
+{
+  < IDENT > <EQUALS > expr() < SEMI>
+}
+
+void expr(): {}  /*OrExpr*/
+{
+  orExpr()}
+
+/*OrExpr = AndExpr{ "||" AndExpr}.*/
+void orExpr ():{}{
+  andExpr() (< OR > andExpr())*}
+
+/*AndExpr = RelExpr{ "&&" RelExpr}.*/
+void andExpr():{}{
+  relExpr() (< KAUFUND > relExpr())*}
+
+/*RelExpr = SimpleExpr[ ("==" | "!=" | "<" | "<=" | ">" | ">=") SimpleExpr].*/
+void relExpr():{}{
+	simpleExpr() ((< GLEICHGLEICH >| < AUSGLEICH>| < KLEINER> | < KLEINERGLEICH> | < GROESSER >
+	| < GROESSERGLEICH > ) simpleExpr())+}
+/*SimpleExpr = ["+" | "-"] Term { ("+" | "-") Term }.*/
+void simpleExpr(): {}
+{
+  (< PLUS >| < MINUS >)? term() (< PLUS >| < MINUS > term())* }
+  /*Term = NotFact{ ("*" | "/") NotFact}.*/
+void term():{}{
+	notFact() (< MAL >| < DIV > notFact())*  }
+
+/*NotFact = ["!"] Fact.*/
+void notFact ():{ }
+{
+ (< AUSRUF >)+ fact()  }
+
+/*Fact = number | ident["(" [ ActParList] ")" ] | "(" Expr")".*/
+void fact():{}{
+  < NUMBER > | < IDENT > (<RLKLAMMER > (actParList())+ < RRKLAMMER >)+ | (<RLKLAMMER > expr() < RRKLAMMER >)}
+
+/*CallStat = Call ";".*/
+void callStat():{}
+{	call() < SEMI>
+}
+
+/*Call = ident "(" [ ActParList] ")"*/
+void call(): {}
+{
+  < IDENT > <RLKLAMMER > (actParList())+  <RRKLAMMER > /*[ ActParList]*/  }
+
+/*ActParList = Expr{ "," Expr}.*/
+void actParList(): {}
+{	expr() (< KOMMA > expr())* 
+}
+
+/*"while" "(" Expr")" Stat.*/
+void whileState():{}{
+  < WHILE > <RLKLAMMER > expr() < RRKLAMMER > <STAT > /*STAT ? */ }
+
+/*ReturnStat = "return" [ Expr] ";" .*/
+void returnStat ():{}{
+  < RETURN > (expr())+ < SEMI >}
+
+/*VarDef = Type ident[ Init] ";".*/
+void varDef(): {}{
+  	< TYPE > < IDENT > ( init())+ <SEMI > }
+
+/*Init = "=" number.*/
+void init():{}
+{
+  < EQUALS > < NUMBER >
+}
+
+/*FuncDef = FuncHeadBlock*/
+void funcHead() :{}
+{
+  < TYPE > <IDENT >< RLKLAMMER > < ELKLAMMER> /*FromParList*/ < ERKLAMMER> < RRKLAMMER> }
