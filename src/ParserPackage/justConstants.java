@@ -73,11 +73,9 @@ public interface justConstants {
   /** RegularExpression Id. */
   int DIGIT = 35;
   /** RegularExpression Id. */
-  int WORD = 36;
+  int IDENT = 36;
   /** RegularExpression Id. */
   int LETTER = 37;
-  /** RegularExpression Id. */
-  int IDENT = 38;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -120,10 +118,8 @@ public interface justConstants {
     "\"byref\"",
     "<NUMBER>",
     "<DIGIT>",
-    "<WORD>",
-    "<LETTER>",
     "<IDENT>",
-    "\";;\"",
+    "<LETTER>",
   };
 
 }

@@ -4,47 +4,48 @@
 options
 {
   static = true;
+  LOOKAHEAD = 3;
 } 
   
 PARSER_BEGIN(just) 
 package ParserPackage;
+import java.io.*;
 
 public class just 
 { 
-  public static void main(String args []) throws ParseException
+  public static void main(String args []) throws ParseException, Exception
   {
-    just parser = new just(System.in);
-    while (true)
-    {
-      System.out.println("Reading from standard input...");
-      System.out.print("Enter an Just synatax  :");
-      try
-      {
-        switch (just.one_line())
-        {
-          case 0 : 
-          System.out.println("OK.");
-          break;
-          case 1 : 
-          System.out.println("Goodbye.");
-          break;
-          default : 
-          break;
-        }
-      }
-      catch (Exception e)
-      {
-        System.out.println("NOK.");
-        System.out.println(e.getMessage());
-        just.ReInit(System.in);
-      }
-      catch (Error e)
-      {
-        System.out.println("Oops.");
-        System.out.println(e.getMessage());
-        break;
-      }
-    }
+	just parser = new just(new java.io.FileInputStream (args[0]));
+    //just parser = new just(System.in);
+         
+	  System.out.println("Reading from standard input...");
+	  System.out.print("Enter an Just synatax  :");
+	  try
+	  {
+	    switch (just.one_line())
+	    {
+	      case 0 : 
+	      System.out.println("OK.");
+	      break;
+	      case 1 : 
+	      System.out.println("Goodbye.");
+	      break;
+	      default : 
+	      break;
+	    }
+	  }
+	  catch (Exception e)
+	  {
+	    System.out.println("NOK.");
+	    System.out.println(e.getMessage());
+	    just.ReInit(System.in);
+	  }
+	  catch (Error e)
+	  {
+	    System.out.println("Oops.");
+	    System.out.println(e.getMessage());
+	  }
+	    
   }
 }
 
@@ -94,29 +95,21 @@ TOKEN : /* OPERATORS */
 
 TOKEN : 
 {
-	  < NUMBER : (< DIGIT >) >
+	  < NUMBER : (< DIGIT >)+ >
 	| < #DIGIT : [ "0"-"9" ]   >
 }
 
 TOKEN : 
 {
-	  < WORD : (< LETTER >)+ >
+	  < IDENT : (< LETTER >)+ >
 	| < #LETTER : ["a"-"z", "A"-"Z", "_"] >
-}
-
-TOKEN:
-{   < IDENT : < WORD > (< WORD > | < NUMBER >)* >
 }
 
 
 int one_line() :
 {}
 {
-  firstExpression() ";;"
-  {
-    return 0;
-  }
-| ";;"
+  firstExpression()
   {
     return 1;
   }
@@ -146,9 +139,9 @@ void defintion(): {}{
 /* FuncDef =FuncHeadBlock.*/
 void funcDef():{}
 {
-  funcHeadBlock()}
+  funcHead() block()}
 /*FuncHead = Type ident "(" [ FormParList] ")".*/
-void funcHeadBlock(): {}
+void funcHead(): {}
 {
   < TYPE > <IDENT > <RLKLAMMER > [formParList()] < RRKLAMMER >}
 
@@ -181,7 +174,7 @@ void relExpr():{}{
 /*SimpleExpr = ["+" | "-"] Term { ("+" | "-") Term }.*/
 void simpleExpr(): {}
 {
-  (< PLUS >| < MINUS >)? term() (< PLUS >| < MINUS > term())* }
+  (< PLUS >| < MINUS >)? term() ((< PLUS >| < MINUS >)  term())* }
   /*Term = NotFact{ ("*" | "/") NotFact}.*/
 void term():{}{
 	notFact() (< MAL >| < DIV > notFact())*  }
@@ -237,9 +230,3 @@ void init():{}
 {
   < EQUALS > < NUMBER >
 }
-
-/*FuncDef = FuncHeadBlock*/
-//funchead = Type ident "(" [ FormParList] ")".
-void funcHead() :{}
-{
-  < TYPE > <IDENT >< RLKLAMMER > [formParList()] < RRKLAMMER> }
