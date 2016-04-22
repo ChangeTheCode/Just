@@ -69,13 +69,19 @@ public class just implements justConstants {
     defintion();
   }
 
+/*Block = "{" { VarDef| Stat} "}".*/
   static final public void block() throws ParseException {
     jj_consume_token(LGESCHWEIFT);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case TYPE:
-      case STAT:
+      case LGESCHWEIFT:
+      case SEMI:
+      case IF:
+      case WHILE:
+      case RETURN:
+      case IDENT:
         ;
         break;
       default:
@@ -86,8 +92,13 @@ public class just implements justConstants {
       case TYPE:
         varDef();
         break;
-      case STAT:
-        jj_consume_token(STAT);
+      case LGESCHWEIFT:
+      case SEMI:
+      case IF:
+      case WHILE:
+      case RETURN:
+      case IDENT:
+        statement();
         break;
       default:
         jj_la1[2] = jj_gen;
@@ -134,18 +145,14 @@ public class just implements justConstants {
     jj_consume_token(TYPE);
     jj_consume_token(IDENT);
     jj_consume_token(RLKLAMMER);
-    label_3:
-    while (true) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TYPE:
+    case BYREF:
       formParList();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TYPE:
-      case BYREF:
-        ;
-        break;
-      default:
-        jj_la1[5] = jj_gen;
-        break label_3;
-      }
+      break;
+    default:
+      jj_la1[5] = jj_gen;
+      ;
     }
     jj_consume_token(RRKLAMMER);
   }
@@ -162,7 +169,7 @@ public class just implements justConstants {
     }
     jj_consume_token(TYPE);
     jj_consume_token(IDENT);
-    label_4:
+    label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case KOMMA:
@@ -170,20 +177,16 @@ public class just implements justConstants {
         break;
       default:
         jj_la1[7] = jj_gen;
-        break label_4;
+        break label_3;
       }
       jj_consume_token(KOMMA);
-      label_5:
-      while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case BYREF:
         jj_consume_token(BYREF);
-        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case BYREF:
-          ;
-          break;
-        default:
-          jj_la1[8] = jj_gen;
-          break label_5;
-        }
+        break;
+      default:
+        jj_la1[8] = jj_gen;
+        ;
       }
       jj_consume_token(TYPE);
       jj_consume_token(IDENT);
@@ -205,7 +208,7 @@ public class just implements justConstants {
 /*OrExpr = AndExpr{ "||" AndExpr}.*/
   static final public void orExpr() throws ParseException {
     andExpr();
-    label_6:
+    label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case OR:
@@ -213,7 +216,7 @@ public class just implements justConstants {
         break;
       default:
         jj_la1[9] = jj_gen;
-        break label_6;
+        break label_4;
       }
       jj_consume_token(OR);
       andExpr();
@@ -223,7 +226,7 @@ public class just implements justConstants {
 /*AndExpr = RelExpr{ "&&" RelExpr}.*/
   static final public void andExpr() throws ParseException {
     relExpr();
-    label_7:
+    label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case KAUFUND:
@@ -231,7 +234,7 @@ public class just implements justConstants {
         break;
       default:
         jj_la1[10] = jj_gen;
-        break label_7;
+        break label_5;
       }
       jj_consume_token(KAUFUND);
       relExpr();
@@ -241,8 +244,13 @@ public class just implements justConstants {
 /*RelExpr = SimpleExpr[ ("==" | "!=" | "<" | "<=" | ">" | ">=") SimpleExpr].*/
   static final public void relExpr() throws ParseException {
     simpleExpr();
-    label_8:
-    while (true) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case GLEICHGLEICH:
+    case AUSGLEICH:
+    case KLEINER:
+    case KLEINERGLEICH:
+    case GROESSER:
+    case GROESSERGLEICH:
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case GLEICHGLEICH:
         jj_consume_token(GLEICHGLEICH);
@@ -268,19 +276,10 @@ public class just implements justConstants {
         throw new ParseException();
       }
       simpleExpr();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case GLEICHGLEICH:
-      case AUSGLEICH:
-      case KLEINER:
-      case KLEINERGLEICH:
-      case GROESSER:
-      case GROESSERGLEICH:
-        ;
-        break;
-      default:
-        jj_la1[12] = jj_gen;
-        break label_8;
-      }
+      break;
+    default:
+      jj_la1[12] = jj_gen;
+      ;
     }
   }
 
@@ -307,7 +306,7 @@ public class just implements justConstants {
       ;
     }
     term();
-    label_9:
+    label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case PLUS:
@@ -316,7 +315,7 @@ public class just implements justConstants {
         break;
       default:
         jj_la1[15] = jj_gen;
-        break label_9;
+        break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case PLUS:
@@ -337,7 +336,7 @@ public class just implements justConstants {
   /*Term = NotFact{ ("*" | "/") NotFact}.*/
   static final public void term() throws ParseException {
     notFact();
-    label_10:
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAL:
@@ -346,7 +345,7 @@ public class just implements justConstants {
         break;
       default:
         jj_la1[17] = jj_gen;
-        break label_10;
+        break label_7;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAL:
@@ -366,17 +365,13 @@ public class just implements justConstants {
 
 /*NotFact = ["!"] Fact.*/
   static final public void notFact() throws ParseException {
-    label_11:
-    while (true) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case AUSRUF:
       jj_consume_token(AUSRUF);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case AUSRUF:
-        ;
-        break;
-      default:
-        jj_la1[19] = jj_gen;
-        break label_11;
-      }
+      break;
+    default:
+      jj_la1[19] = jj_gen;
+      ;
     }
     fact();
   }
@@ -389,32 +384,27 @@ public class just implements justConstants {
       break;
     case IDENT:
       jj_consume_token(IDENT);
-      label_12:
-      while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case RLKLAMMER:
         jj_consume_token(RLKLAMMER);
-        label_13:
-        while (true) {
-          actParList();
-          switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-          case PLUS:
-          case MINUS:
-          case AUSRUF:
-            ;
-            break;
-          default:
-            jj_la1[20] = jj_gen;
-            break label_13;
-          }
-        }
-        jj_consume_token(RRKLAMMER);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case RLKLAMMER:
-          ;
+        case PLUS:
+        case MINUS:
+        case AUSRUF:
+        case NUMBER:
+        case IDENT:
+          actParList();
           break;
         default:
-          jj_la1[21] = jj_gen;
-          break label_12;
+          jj_la1[20] = jj_gen;
+          ;
         }
+        jj_consume_token(RRKLAMMER);
+        break;
+      default:
+        jj_la1[21] = jj_gen;
+        ;
       }
       break;
     case RLKLAMMER:
@@ -439,38 +429,85 @@ public class just implements justConstants {
   static final public void call() throws ParseException {
     jj_consume_token(IDENT);
     jj_consume_token(RLKLAMMER);
-    label_14:
-    while (true) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case RLKLAMMER:
+    case PLUS:
+    case MINUS:
+    case AUSRUF:
+    case NUMBER:
+    case IDENT:
       actParList();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case PLUS:
-      case MINUS:
-      case AUSRUF:
-        ;
-        break;
-      default:
-        jj_la1[23] = jj_gen;
-        break label_14;
-      }
+      break;
+    default:
+      jj_la1[23] = jj_gen;
+      ;
     }
     jj_consume_token(RRKLAMMER);
+  }
+
+//Stat = AssignStat| CallStat| IfStat| WhileStat| ReturnStat| Block | ";".
+  static final public void statement() throws ParseException {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case IDENT:
+      assignStat();
+      break;
+    case IF:
+      ifStat();
+      break;
+    case WHILE:
+      whileState();
+      break;
+    case RETURN:
+      returnStat();
+      break;
+      callStat();
+      break;
+    case LGESCHWEIFT:
+      block();
+      break;
+    case SEMI:
+      jj_consume_token(SEMI);
+      break;
+    default:
+      jj_la1[24] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
   }
 
 /*ActParList = Expr{ "," Expr}.*/
   static final public void actParList() throws ParseException {
     expr();
-    label_15:
+    label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case KOMMA:
         ;
         break;
       default:
-        jj_la1[24] = jj_gen;
-        break label_15;
+        jj_la1[25] = jj_gen;
+        break label_8;
       }
       jj_consume_token(KOMMA);
       expr();
+    }
+  }
+
+//IfStat = "if" "(" Expr ")" Stat [ "else" Stat ].
+  static final public void ifStat() throws ParseException {
+    jj_consume_token(IF);
+    jj_consume_token(RLKLAMMER);
+    expr();
+    jj_consume_token(RRKLAMMER);
+    statement();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case ELSE:
+      jj_consume_token(ELSE);
+      statement();
+      break;
+    default:
+      jj_la1[26] = jj_gen;
+      ;
     }
   }
 
@@ -480,25 +517,24 @@ public class just implements justConstants {
     jj_consume_token(RLKLAMMER);
     expr();
     jj_consume_token(RRKLAMMER);
-    jj_consume_token(STAT);
+    statement();
   }
 
 /*ReturnStat = "return" [ Expr] ";" .*/
   static final public void returnStat() throws ParseException {
     jj_consume_token(RETURN);
-    label_16:
-    while (true) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case RLKLAMMER:
+    case PLUS:
+    case MINUS:
+    case AUSRUF:
+    case NUMBER:
+    case IDENT:
       expr();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case PLUS:
-      case MINUS:
-      case AUSRUF:
-        ;
-        break;
-      default:
-        jj_la1[25] = jj_gen;
-        break label_16;
-      }
+      break;
+    default:
+      jj_la1[27] = jj_gen;
+      ;
     }
     jj_consume_token(SEMI);
   }
@@ -507,17 +543,13 @@ public class just implements justConstants {
   static final public void varDef() throws ParseException {
     jj_consume_token(TYPE);
     jj_consume_token(IDENT);
-    label_17:
-    while (true) {
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case EQUALS:
       init();
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case EQUALS:
-        ;
-        break;
-      default:
-        jj_la1[26] = jj_gen;
-        break label_17;
-      }
+      break;
+    default:
+      jj_la1[28] = jj_gen;
+      ;
     }
     jj_consume_token(SEMI);
   }
@@ -529,12 +561,20 @@ public class just implements justConstants {
   }
 
 /*FuncDef = FuncHeadBlock*/
+//funchead = Type ident "(" [ FormParList] ")".
   static final public void funcHead() throws ParseException {
     jj_consume_token(TYPE);
     jj_consume_token(IDENT);
     jj_consume_token(RLKLAMMER);
-    jj_consume_token(ELKLAMMER);
-    jj_consume_token(ERKLAMMER);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TYPE:
+    case BYREF:
+      formParList();
+      break;
+    default:
+      jj_la1[29] = jj_gen;
+      ;
+    }
     jj_consume_token(RRKLAMMER);
   }
 
@@ -548,7 +588,7 @@ public class just implements justConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[27];
+  static final private int[] jj_la1 = new int[30];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -556,10 +596,10 @@ public class just implements justConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x20,0x40,0x40,0x40,0x40,0x80000040,0x80000000,0x8000,0x80000000,0x80000,0x40000,0x3f00000,0x3f00000,0xc000000,0xc000000,0xc000000,0xc000000,0x30000000,0x30000000,0x40000000,0x4c000000,0x4000,0x4000,0x4c000000,0x8000,0x4c000000,0x1000,};
+      jj_la1_0 = new int[] {0x20,0xd08c0,0xd08c0,0x40,0x40,0x40,0x0,0x8000,0x0,0x200000,0x100000,0xfc00000,0xfc00000,0x30000000,0x30000000,0x30000000,0x30000000,0xc0000000,0xc0000000,0x0,0x30004000,0x4000,0x4000,0x30004000,0xd0880,0x8000,0x20000,0x30004000,0x1000,0x40,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x80,0x20,0x20,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x11,0x0,0x0,0x0,0x0,};
+      jj_la1_1 = new int[] {0x80,0x40,0x40,0x0,0x0,0x2,0x2,0x0,0x2,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x45,0x0,0x44,0x45,0x40,0x0,0x0,0x45,0x0,0x2,};
    }
 
   /** Constructor with InputStream. */
@@ -580,7 +620,7 @@ public class just implements justConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -594,7 +634,7 @@ public class just implements justConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -611,7 +651,7 @@ public class just implements justConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -621,7 +661,7 @@ public class just implements justConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -637,7 +677,7 @@ public class just implements justConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -646,7 +686,7 @@ public class just implements justConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 27; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 30; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -702,7 +742,7 @@ public class just implements justConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 27; i++) {
+    for (int i = 0; i < 30; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

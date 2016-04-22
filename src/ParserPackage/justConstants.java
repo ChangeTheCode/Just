@@ -33,51 +33,51 @@ public interface justConstants {
   /** RegularExpression Id. */
   int KOMMA = 15;
   /** RegularExpression Id. */
-  int WHILE = 16;
+  int IF = 16;
   /** RegularExpression Id. */
-  int RETURN = 17;
+  int ELSE = 17;
   /** RegularExpression Id. */
-  int KAUFUND = 18;
+  int WHILE = 18;
   /** RegularExpression Id. */
-  int OR = 19;
+  int RETURN = 19;
   /** RegularExpression Id. */
-  int GLEICHGLEICH = 20;
+  int KAUFUND = 20;
   /** RegularExpression Id. */
-  int AUSGLEICH = 21;
+  int OR = 21;
   /** RegularExpression Id. */
-  int KLEINER = 22;
+  int GLEICHGLEICH = 22;
   /** RegularExpression Id. */
-  int KLEINERGLEICH = 23;
+  int AUSGLEICH = 23;
   /** RegularExpression Id. */
-  int GROESSER = 24;
+  int KLEINER = 24;
   /** RegularExpression Id. */
-  int GROESSERGLEICH = 25;
+  int KLEINERGLEICH = 25;
   /** RegularExpression Id. */
-  int PLUS = 26;
+  int GROESSER = 26;
   /** RegularExpression Id. */
-  int MINUS = 27;
+  int GROESSERGLEICH = 27;
   /** RegularExpression Id. */
-  int MAL = 28;
+  int PLUS = 28;
   /** RegularExpression Id. */
-  int DIV = 29;
+  int MINUS = 29;
   /** RegularExpression Id. */
-  int AUSRUF = 30;
+  int MAL = 30;
   /** RegularExpression Id. */
-  int BYREF = 31;
+  int DIV = 31;
   /** RegularExpression Id. */
-  int NUMBER = 32;
+  int AUSRUF = 32;
   /** RegularExpression Id. */
-  int DIGIT = 33;
+  int BYREF = 33;
   /** RegularExpression Id. */
-  int WORD = 34;
+  int NUMBER = 34;
   /** RegularExpression Id. */
-  int LETTER = 35;
+  int DIGIT = 35;
   /** RegularExpression Id. */
-  int IDENT = 36;
+  int WORD = 36;
   /** RegularExpression Id. */
-  int STAT = 37;
+  int LETTER = 37;
   /** RegularExpression Id. */
-  int konkSTAT = 38;
+  int IDENT = 38;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -100,6 +100,8 @@ public interface justConstants {
     "\")\"",
     "\"(\"",
     "\",\"",
+    "\"if\"",
+    "\"else\"",
     "\"while\"",
     "\"return\"",
     "\"&&\"",
@@ -121,8 +123,6 @@ public interface justConstants {
     "<WORD>",
     "<LETTER>",
     "<IDENT>",
-    "<STAT>",
-    "<konkSTAT>",
     "\";;\"",
   };
 

@@ -10,7 +10,7 @@ PARSER_BEGIN(just)
 package ParserPackage;
 
 public class just 
-{
+{ 
   public static void main(String args []) throws ParseException
   {
     just parser = new just(System.in);
@@ -71,6 +71,8 @@ TOKEN : /* OPERATORS */
 	| < RRKLAMMER : ")" >
 	| < RLKLAMMER : "(" >
 	| < KOMMA : ",">
+	| < IF : "if" >
+	| < ELSE : "else" >
 	| < WHILE : "while" >
 	| < RETURN : "return" >
 	| < KAUFUND : "&&" >
@@ -92,8 +94,8 @@ TOKEN : /* OPERATORS */
 
 TOKEN : 
 {
-	  < NUMBER : (< DIGIT >)+ >
-	| < #DIGIT : [ "0"-"9" ] >
+	  < NUMBER : (< DIGIT >) >
+	| < #DIGIT : [ "0"-"9" ]   >
 }
 
 TOKEN : 
@@ -106,10 +108,6 @@ TOKEN:
 {   < IDENT : < WORD > (< WORD > | < NUMBER >)* >
 }
 
-TOKEN:
-{	< STAT :  < konkSTAT > | < SEMI > >
-	| < #konkSTAT : "AssignStat" | "CallStat" | "IfStat" | "WhileStat" | "ReturnStat" | "Block" >
-}
 
 int one_line() :
 {}
@@ -136,13 +134,14 @@ void programmCode():
   	defintion() 
 }
 
+/*Block = "{" { VarDef| Stat} "}".*/
 void block(): {}
-{	< LGESCHWEIFT > (varDef() | < STAT >)* < RGESCHWEIFT >
+{	< LGESCHWEIFT > (varDef() |  statement())* < RGESCHWEIFT >
 }
 
 /*Definition= { VarDef| FuncDef}.*/
 void defintion(): {}{
-  (varDef() | funcDef())*}
+   (varDef() | funcDef())* } 
 
 /* FuncDef =FuncHeadBlock.*/
 void funcDef():{}
@@ -151,11 +150,11 @@ void funcDef():{}
 /*FuncHead = Type ident "(" [ FormParList] ")".*/
 void funcHeadBlock(): {}
 {
-  < TYPE > <IDENT > <RLKLAMMER > (formParList())+ < RRKLAMMER >}
+  < TYPE > <IDENT > <RLKLAMMER > [formParList()] < RRKLAMMER >}
 
 /*FormParList = ["byref"] Type ident{"," ["byref"] Type ident}.*/
 void formParList():{}{
-  (< BYREF >)? <TYPE > <IDENT > ( < KOMMA >  (< BYREF >)+ < TYPE > <IDENT >)* }
+  [< BYREF >] <TYPE > <IDENT > ( < KOMMA >  [< BYREF >] < TYPE > <IDENT >)* }
  
 /*ident "=" Expr";".*/
 void assignStat ():{}
@@ -177,8 +176,8 @@ void andExpr():{}{
 
 /*RelExpr = SimpleExpr[ ("==" | "!=" | "<" | "<=" | ">" | ">=") SimpleExpr].*/
 void relExpr():{}{
-	simpleExpr() ((< GLEICHGLEICH >| < AUSGLEICH>| < KLEINER> | < KLEINERGLEICH> | < GROESSER >
-	| < GROESSERGLEICH > ) simpleExpr())+}
+	simpleExpr()[(< GLEICHGLEICH >| < AUSGLEICH>| < KLEINER> | < KLEINERGLEICH> | < GROESSER >
+	| < GROESSERGLEICH > ) simpleExpr()]}
 /*SimpleExpr = ["+" | "-"] Term { ("+" | "-") Term }.*/
 void simpleExpr(): {}
 {
@@ -190,11 +189,11 @@ void term():{}{
 /*NotFact = ["!"] Fact.*/
 void notFact ():{ }
 {
- (< AUSRUF >)+ fact()  }
+ [< AUSRUF >] fact()  }
 
 /*Fact = number | ident["(" [ ActParList] ")" ] | "(" Expr")".*/
 void fact():{}{
-  < NUMBER > | < IDENT > (<RLKLAMMER > (actParList())+ < RRKLAMMER >)+ | (<RLKLAMMER > expr() < RRKLAMMER >)}
+  < NUMBER > | < IDENT > [<RLKLAMMER > [actParList()] < RRKLAMMER >] | (<RLKLAMMER > expr() < RRKLAMMER >)}
 
 /*CallStat = Call ";".*/
 void callStat():{}
@@ -204,24 +203,34 @@ void callStat():{}
 /*Call = ident "(" [ ActParList] ")"*/
 void call(): {}
 {
-  < IDENT > <RLKLAMMER > (actParList())+  <RRKLAMMER > /*[ ActParList]*/  }
+  < IDENT > <RLKLAMMER > [actParList()]  <RRKLAMMER > /*[ ActParList]*/  }
+
+//Stat = AssignStat| CallStat| IfStat| WhileStat| ReturnStat| Block | ";".
+void statement ():{}
+{
+  assignStat()  |  ifStat() |whileState() | returnStat()| callStat() | block() | <SEMI >
+}
 
 /*ActParList = Expr{ "," Expr}.*/
 void actParList(): {}
 {	expr() (< KOMMA > expr())* 
 }
 
+//IfStat = "if" "(" Expr ")" Stat [ "else" Stat ].
+void ifStat():{ }{
+  < IF > <RLKLAMMER > expr() <RRKLAMMER > statement()  [ <ELSE >  statement()  ]}
+
 /*"while" "(" Expr")" Stat.*/
 void whileState():{}{
-  < WHILE > <RLKLAMMER > expr() < RRKLAMMER > <STAT > /*STAT ? */ }
+  < WHILE > <RLKLAMMER > expr() < RRKLAMMER >  statement()   }
 
 /*ReturnStat = "return" [ Expr] ";" .*/
 void returnStat ():{}{
-  < RETURN > (expr())+ < SEMI >}
+  < RETURN > [expr()] < SEMI >}
 
 /*VarDef = Type ident[ Init] ";".*/
 void varDef(): {}{
-  	< TYPE > < IDENT > ( init())+ <SEMI > }
+  	< TYPE > < IDENT > [init()] <SEMI >  }
 
 /*Init = "=" number.*/
 void init():{}
@@ -230,6 +239,7 @@ void init():{}
 }
 
 /*FuncDef = FuncHeadBlock*/
+//funchead = Type ident "(" [ FormParList] ")".
 void funcHead() :{}
 {
-  < TYPE > <IDENT >< RLKLAMMER > < ELKLAMMER> /*FromParList*/ < ERKLAMMER> < RRKLAMMER> }
+  < TYPE > <IDENT >< RLKLAMMER > [formParList()] < RRKLAMMER> }
