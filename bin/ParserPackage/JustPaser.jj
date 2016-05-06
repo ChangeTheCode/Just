@@ -12,9 +12,12 @@ package ParserPackage;
 import java.io.*;
 
 public class just 
-{ 
+{
+  static SymbolTable mySymbols = new SymbolTable();
+ 
   public static void main(String args []) throws ParseException, Exception
   {
+	
 	just parser = new just(new java.io.FileInputStream (args[0]));
     //just parser = new just(System.in);
          
@@ -27,10 +30,10 @@ public class just
 	      case 0 : 
 	      System.out.println("OK.");
 	      break;
-	      case 1 : 
+	      case 1 :
 	      System.out.println("Goodbye.");
 	      break;
-	      default : 
+	      default :
 	      break;
 	    }
 	  }
@@ -45,8 +48,9 @@ public class just
 	    System.out.println("Oops.");
 	    System.out.println(e.getMessage());
 	  }
-	    
+	  mySymbols.printList(); 
   }
+  
 }
 
 PARSER_END(just)
@@ -112,13 +116,17 @@ int one_line() :
   firstExpression()
   {
     return 1;
-  }
+  } 
 }
 
 void firstExpression():
-{}
 {
-	< PROGRAM > < IDENT > <LGESCHWEIFT> programmCode() <RGESCHWEIFT>
+	Token myToken;
+	Token type;
+}
+{
+	type = < PROGRAM > myToken = < IDENT > <LGESCHWEIFT> programmCode() <RGESCHWEIFT>	{
+	  	mySymbols.add(myToken, type);	}
 }  
 
 void programmCode():
@@ -141,13 +149,26 @@ void funcDef():{}
 {
   funcHead() block()}
 /*FuncHead = Type ident "(" [ FormParList] ")".*/
-void funcHead(): {}
+void funcHead():{
+	Token type, ident;
+}
 {
-  < TYPE > <IDENT > <RLKLAMMER > [formParList()] < RRKLAMMER >}
+  type = < TYPE > ident = <IDENT > <RLKLAMMER > [formParList()] < RRKLAMMER >
+  {
+    mySymbols.add(ident, type);  }}
 
 /*FormParList = ["byref"] Type ident{"," ["byref"] Type ident}.*/
-void formParList():{}{
-  [< BYREF >] <TYPE > <IDENT > ( < KOMMA >  [< BYREF >] < TYPE > <IDENT >)* }
+void formParList():{
+	Token type, ident, byRef;
+	Token type2 = null, ident2 =null, byRef2 =null;
+}{
+  [byRef = < BYREF >] type = <TYPE > ident = <IDENT > ( < KOMMA >  [byRef2 = < BYREF >] type2 = < TYPE > ident2 = <IDENT >)*
+  {
+    mySymbols.add(ident, type);
+    if(ident2.image != null && type2.image != null)    {
+    	mySymbols.add(ident2, type2);      }
+    
+    // TODO:  byref erweitern   } }
  
 /*ident "=" Expr";".*/
 void assignStat ():{}
@@ -222,8 +243,12 @@ void returnStat ():{}{
   < RETURN > [expr()] < SEMI >}
 
 /*VarDef = Type ident[ Init] ";".*/
-void varDef(): {}{
-  	< TYPE > < IDENT > [init()] <SEMI >  }
+void varDef(): {
+	Token ident, type;
+}{
+  	type = < TYPE > ident = < IDENT > [init()] <SEMI >
+  	{
+  	  mySymbols.add(ident, type);  	}  }
 
 /*Init = "=" number.*/
 void init():{}
